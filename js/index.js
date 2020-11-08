@@ -6,13 +6,18 @@ const startVideo = () => {
     if (Array.isArray(devices)) {
       devices.forEach((device) => {
         if (device.kind === 'videoinput') {
-          if (device.label.includes('Logitech')) {
-            navigator.getUserMedia(
-              { video: { deviceId: device.deviceId } },
-              (stream) => (cam.srcObject = stream),
-              (error) => console.error(error),
-            );
-          }
+          // if (device.label.includes('Logitech')) {
+          //   navigator.getUserMedia(
+          //     { video: { deviceId: device.deviceId } },
+          //     (stream) => (cam.srcObject = stream),
+          //     (error) => console.error(error),
+          //   );
+          // }
+          navigator.getUserMedia(
+            { video: { deviceId: device.deviceId } },
+            (stream) => (cam.srcObject = stream),
+            (error) => console.error(error),
+          );
         }
       });
     }
@@ -33,6 +38,7 @@ const loadLabels = () => {
           .withFaceDescriptor();
         descriptions.push(detections.descriptor);
       }
+      console.log('loading complete')
       return new faceapi.LabeledFaceDescriptors(label, descriptions);
     }),
   );
@@ -54,6 +60,7 @@ cam.addEventListener('play', async () => {
   const labels = await loadLabels();
   faceapi.matchDimensions(canvas, canvasSize);
   document.body.appendChild(canvas);
+  console.log('render complete');
   setInterval(async () => {
     const detections = await faceapi
       .detectAllFaces(cam, new faceapi.TinyFaceDetectorOptions())
