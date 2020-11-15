@@ -25,12 +25,13 @@ const startVideo = () => {
 };
 
 const loadLabels = () => {
-  const labels = ['4A6G0068', '4A6G0067'];
+  const labels = ['4A6G0068', '4A6G0067', '陳美雪'];
   return Promise.all(
     labels.map(async (label) => {
       const descriptions = [];
       for (let i = 0; i < 1; i++) {
         const img = await faceapi.fetchImage(`/labels/${label}/${i}.jpg`);
+        console.log(img);
         console.log('image loaded');
         const detections = await faceapi
           .detectSingleFace(img)
@@ -38,7 +39,8 @@ const loadLabels = () => {
           .withFaceDescriptor();
         descriptions.push(detections.descriptor);
       }
-      console.log('loading complete')
+      console.log(descriptions);
+      console.log('loading complete');
       return new faceapi.LabeledFaceDescriptors(label, descriptions);
     }),
   );
@@ -58,6 +60,7 @@ cam.addEventListener('play', async () => {
   const canvas = faceapi.createCanvasFromMedia(cam);
   const canvasSize = { width: cam.width, height: cam.height };
   const labels = await loadLabels();
+  console.log(labels);
   faceapi.matchDimensions(canvas, canvasSize);
   document.body.appendChild(canvas);
   console.log('render complete');
