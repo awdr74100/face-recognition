@@ -25,19 +25,30 @@ const startVideo = () => {
 };
 
 const loadLabels = () => {
-  const labels = ['4A6G0068', '4A6G0067', '陳美雪'];
+  const labels = ['4A6G0068'];
   return Promise.all(
     labels.map(async (label) => {
       const descriptions = [];
-      for (let i = 0; i < 1; i++) {
+      for (let i = 0; i < 3; i++) {
         const img = await faceapi.fetchImage(`/labels/${label}/${i}.jpg`);
-        console.log(img);
-        console.log('image loaded');
+        const sourceImg = document.createElement('img');
+        sourceImg.src = img.src;
         const detections = await faceapi
-          .detectSingleFace(img)
+          .detectSingleFace(sourceImg)
           .withFaceLandmarks()
           .withFaceDescriptor();
-        descriptions.push(detections.descriptor);
+        const descriptor = detections.descriptor;
+        const toString = JSON.stringify(descriptor);
+        const toArray = JSON.parse(toString);
+        const float32Array = Float32Array.from(Object.values(toArray));
+        console.log(
+          float32Array.every((item, index) => item === descriptor[index]),
+        );
+        console.log(descriptor);
+        // console.log(Object.values(toArray));
+        console.log(float32Array);
+        descriptions.push(float32Array);
+        // descriptions.push(detections.descriptor);
       }
       console.log(descriptions);
       console.log('loading complete');
@@ -56,7 +67,6 @@ Promise.all([
 ]).then(startVideo);
 
 cam.addEventListener('play', async () => {
-  console.log('ff');
   const canvas = faceapi.createCanvasFromMedia(cam);
   const canvasSize = { width: cam.width, height: cam.height };
   const labels = await loadLabels();
